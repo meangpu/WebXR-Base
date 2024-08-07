@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=yes"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+
+    <title>BaseXR</title>
+    <meta property="og:title" content="BaseXR" />
+    <meta property="og:description" content="a base xr template" />
+    <meta property="og:image" content="https://raw.githubusercontent.com/meangpu/PortData/main/Img/MiniProject/egat.webp" />
+
+    <link rel="stylesheet" href="TemplateData/style.css" />
+    <link rel="shortcut icon" href="TemplateData/favicon.png" />
+    <link rel="apple-touch-icon" href="TemplateData/ios_icon.png" />
+  </head>
+
+  <body>
+    <div id="unity-container" class="unity-desktop">
+      <canvas id="unity-canvas"></canvas>
+    </div>
+
+    <div id="loading-cover">
+      <div id="unity-loading-bar">
+        <div id="unity-logo"><img src="logo.png" /></div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
+        </div>
+        <div class="spinner"></div>
+      </div>
+    </div>
+
+    <div id="unity-footer">
+      <div id="unity-webgl-logo"></div>
+      <button id="entervr" value="Enter VR" disabled>VR</button>
+    </div>
+
+    <script>
+            var buildUrl = "Build";
+            var loaderUrl = buildUrl + "/WebXR-Hand.loader.js";
+            var config = {
+              dataUrl: buildUrl + "/WebXR-Hand.data.unityweb",
+              frameworkUrl: buildUrl + "/WebXR-Hand.framework.js.unityweb",
+              codeUrl: buildUrl + "/WebXR-Hand.wasm.unityweb",
+              streamingAssetsUrl: "StreamingAssets",
+              companyName: "meangpu",
+              productName: "BaseXR",
+              productVersion: "0.96-8-Aug-2024 2:09 AM",
+            };
+
+            const container = document.querySelector("#unity-container");
+            const canvas = document.querySelector("#unity-canvas");
+
+            const loadingCover = document.querySelector("#loading-cover");
+            const progressBarEmpty = document.querySelector("#unity-progress-bar-empty");
+            const progressBarFull = document.querySelector("#unity-progress-bar-full");
+
+            const spinner = document.querySelector('.spinner');
+
+            var unityInstance = null;
+            
+
+
+            loadingCover.style.display = "";
+
+            const script = document.createElement("script");
+            script.src = loaderUrl;
+            script.onload = () => {
+              createUnityInstance(canvas, config, (progress) => {
+                spinner.style.display = "none";
+                progressBarEmpty.style.display = "";
+                progressBarFull.style.width = `${100 * progress}%`;
+              }).then((instance) => {
+                unityInstance = instance;
+                loadingCover.style.display = "none";
+              }).catch((message) => {
+                alert(message);
+              });
+            };
+            document.body.appendChild(script);
+
+            let enterVRButton = document.getElementById('entervr');
+
+            document.addEventListener('onVRSupportedCheck', function (event) {
+              enterVRButton.disabled = !event.detail.supported;
+            }, false);
+
+            enterVRButton.addEventListener('click', function (event) {
+              unityInstance.Module.WebXR.toggleVR();
+            }, false);
+    </script>
+  </body>
+</html>
